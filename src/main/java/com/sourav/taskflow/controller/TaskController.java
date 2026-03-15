@@ -1,7 +1,10 @@
 package com.sourav.taskflow.controller;
 
+import com.sourav.taskflow.dto.CreateTaskRequest;
+import com.sourav.taskflow.dto.TaskResponse;
 import com.sourav.taskflow.entity.Task;
 import com.sourav.taskflow.service.TaskService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,8 +18,8 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping
-    public Task createTask(@RequestBody Task task) {
-        return taskService.createTask(task);
+    public TaskResponse createTask(@Valid @RequestBody CreateTaskRequest taskRequest) {
+        return taskService.createTask(taskRequest);
     }
 
     @GetMapping("/project/{projectId}")
