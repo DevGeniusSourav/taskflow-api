@@ -10,11 +10,12 @@ import com.sourav.taskflow.repository.ProjectRepository;
 import com.sourav.taskflow.repository.TaskRepository;
 import com.sourav.taskflow.repository.UserRepository;
 import com.sourav.taskflow.service.TaskService;
+import com.sourav.taskflow.enums.TaskStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -33,39 +34,42 @@ public class TaskServiceImpl implements TaskService {
         Task task = new Task();
         task.setTitle(taskRequest.getTitle());
         task.setDescription(taskRequest.getDescription());
-        task.setStatus("TODO");
+        task.setStatus(TaskStatus.TODO);
         task.setProject(project);
         task.setAssignee(user);
 
         Task savedTask = taskRepository.save(task);
 
+        return mapToResponse(savedTask);
+
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<TaskResponse> getTasks(TaskStatus status, Long projectId, Pageable pageable) {
+        Page<Task> tasks;
+
+        if (status != null && projectId != null) {
+            tasks = taskRepository.findByProjectIdAndStatus(projectId, status, pageable);
+        } else if (status != null) {
+            tasks = taskRepository.findByStatus(status, pageable);
+        } else if (projectId != null) {
+            tasks = taskRepository.findByProjectId(projectId, pageable);
+        } else {
+            tasks = taskRepository.findAll(pageable);
+        }
+        return tasks.map(this::mapToResponse);
+    }
+
+    private TaskResponse mapToResponse(Task task) {
         return new TaskResponse(
-                savedTask.getId(),
-                savedTask.getTitle(),
-                savedTask.getDescription(),
-                savedTask.getStatus(),
-                savedTask.getProject().getId(),
-                savedTask.getAssignee().getId(),
-                savedTask.getCreatedAt()
+                task.getId(),
+                task.getTitle(),
+                task.getDescription(),
+                task.getStatus(),
+                task.getProject().getId(),
+                task.getAssignee().getId(),
+                task.getCreatedAt()
         );
-
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Task> getTasksByProject(Long projectId) {
-        return taskRepository.findByProjectId(projectId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Task> getTasksByStatus(String status) {
-        return taskRepository.findByStatus(status);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Task> getTasksByProjectAndStatus(Long projectId, String status) {
-        return taskRepository.findByProjectIdAndStatus(projectId, status);
     }
 }

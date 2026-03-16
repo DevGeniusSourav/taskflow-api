@@ -1,5 +1,6 @@
 package com.sourav.taskflow.dto;
 
+import com.sourav.taskflow.enums.TaskStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,7 @@ public class TaskResponse {
 
     private String description;
 
-    private String status;
+    private TaskStatus status;
 
     private Long projectId;
 
