@@ -12,11 +12,13 @@ import com.sourav.taskflow.repository.UserRepository;
 import com.sourav.taskflow.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
@@ -50,16 +52,19 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Task> getTasksByProject(Long projectId) {
         return taskRepository.findByProjectId(projectId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Task> getTasksByStatus(String status) {
         return taskRepository.findByStatus(status);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Task> getTasksByProjectAndStatus(Long projectId, String status) {
         return taskRepository.findByProjectIdAndStatus(projectId, status);
     }
