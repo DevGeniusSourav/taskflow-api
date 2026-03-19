@@ -9,13 +9,13 @@ import lombok.Setter;
 @Setter
 public class RegisterRequest {
 
-    @NotBlank
+    @NotBlank(message = "Name cannot be blank")
     private String name;
 
     @Email
-    @NotBlank
+    @NotBlank(message = "Email cannot be blank")
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "Password cannot be blank")
     private String password;
 }

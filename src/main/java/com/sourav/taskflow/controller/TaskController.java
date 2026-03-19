@@ -2,6 +2,7 @@ package com.sourav.taskflow.controller;
 
 import com.sourav.taskflow.dto.CreateTaskRequest;
 import com.sourav.taskflow.dto.TaskResponse;
+import com.sourav.taskflow.dto.auth.UpdateTaskRequest;
 import com.sourav.taskflow.service.TaskService;
 import com.sourav.taskflow.enums.TaskStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +34,16 @@ public class TaskController {
             @RequestParam(required = false) Long projectId,
             Pageable pageable) {
         return taskService.getTasks(status, projectId, pageable);
+    }
+
+    @PatchMapping("/{id}")
+    public TaskResponse updateTask(@PathVariable Long id, @RequestBody UpdateTaskRequest taskRequest) {
+        return taskService.updateTask(id, taskRequest);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteTask(@PathVariable Long id) {
+        taskService.deleteTask(id);
     }
 
 }
