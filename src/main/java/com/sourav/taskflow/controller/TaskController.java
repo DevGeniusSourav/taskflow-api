@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -42,8 +43,15 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteTask(@PathVariable Long id) {
+    public ResponseEntity<?> deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
+        return ResponseEntity.ok("Task Deleted!");
+    }
+
+    @PutMapping("/restore/{id}")
+    public ResponseEntity<?> restoreTask(@PathVariable Long id) {
+        taskService.restoreTask(id);
+        return ResponseEntity.ok("Task Restored!");
     }
 
 }

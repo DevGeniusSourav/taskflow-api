@@ -1,0 +1,2 @@
+ALTER TABLE tasks ADD COLUMN deleted_at TIMESTAMP;
+ALTER TABLE tasks ADD COLUMN deleted_by BIGINT;

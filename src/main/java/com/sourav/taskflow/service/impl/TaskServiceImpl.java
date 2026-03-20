@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service
@@ -35,7 +36,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskResponse createTask(CreateTaskRequest taskRequest) {
         Project project = projectRepository.findById(taskRequest.getProjectId()).orElseThrow(() -> new ResourceNotFoundException("Project not found"));
-        User user = userRepository.findById(taskRequest.getAssigneeId()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = getCurrentUser();
 
         Task task = new Task();
         task.setTitle(taskRequest.getTitle());
@@ -43,6 +44,7 @@ public class TaskServiceImpl implements TaskService {
         task.setStatus(TaskStatus.TODO);
         task.setProject(project);
         task.setAssignee(user);
+        task.setCreatedBy(user.getId());
 
         Task savedTask = taskRepository.save(task);
 
@@ -77,6 +79,7 @@ public class TaskServiceImpl implements TaskService {
             User newAssignee = userRepository.findById(taskRequest.getAssigneeId()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
             task.setAssignee(newAssignee);
         }
+        task.setUpdatedBy(user.getId());
 
         return mapToResponse(taskRepository.save(task));
     }
@@ -90,7 +93,9 @@ public class TaskServiceImpl implements TaskService {
         if (!task.getAssignee().getId().equals(user.getId()) && user.getRole() != Role.ADMIN) {
             throw new AccessDeniedException("Access denied");
         }
-
+        task.setDeleted(true);
+        task.setDeletedBy(user.getId());
+        task.setDeletedAt(LocalDateTime.now());
         taskRepository.delete(task);
     }
 
@@ -130,6 +135,27 @@ public class TaskServiceImpl implements TaskService {
         return tasks.map(this::mapToResponse);
     }
 
+    @Override
+    public void restoreTask(Long id) {
+        Task task = taskRepository.findByIdIncludingDeleted(id).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
+
+        if(!task.isDeleted()){
+            throw new ResourceNotFoundException("Task is not deleted");
+        }
+
+        User user = getCurrentUser();
+
+        if(!task.getAssignee().getId().equals(user.getId()) && user.getRole() != Role.ADMIN) {
+            throw new AccessDeniedException("Access denied");
+        }
+
+        task.setDeleted(false);
+        task.setDeletedAt(null);
+        task.setDeletedBy(null);
+
+        taskRepository.save(task);
+    }
+
     private User getCurrentUser() {
         String email = Objects.requireNonNull(SecurityContextHolder
                         .getContext()
@@ -146,7 +172,9 @@ public class TaskServiceImpl implements TaskService {
                 task.getDescription(),
                 task.getStatus(),
                 task.getProject().getId(),
+                task.getProject().getName(),
                 task.getAssignee().getId(),
+                task.getAssignee().getName(),
                 task.getCreatedAt()
         );
     }

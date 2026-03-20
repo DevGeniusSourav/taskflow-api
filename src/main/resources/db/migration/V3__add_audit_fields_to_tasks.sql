@@ -1,0 +1,2 @@
+ALTER TABLE tasks ADD COLUMN created_by BIGINT;
+ALTER TABLE tasks ADD COLUMN updated_by BIGINT;

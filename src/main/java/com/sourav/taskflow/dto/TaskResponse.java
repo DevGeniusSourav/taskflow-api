@@ -24,7 +24,11 @@ public class TaskResponse {
 
     private Long projectId;
 
+    private String projectName;
+
     private Long assigneeId;
+
+    private String assigneeName;
 
     private LocalDateTime createdAt;
 }
