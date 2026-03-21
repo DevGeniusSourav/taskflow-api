@@ -7,6 +7,9 @@ import com.sourav.taskflow.entity.Project;
 import com.sourav.taskflow.entity.Task;
 import com.sourav.taskflow.entity.User;
 import com.sourav.taskflow.enums.Role;
+import com.sourav.taskflow.event.TaskCreatedEvent;
+import com.sourav.taskflow.event.TaskDeletedEvent;
+import com.sourav.taskflow.event.TaskUpdatedEvent;
 import com.sourav.taskflow.exception.AccessDeniedException;
 import com.sourav.taskflow.exception.ResourceNotFoundException;
 import com.sourav.taskflow.repository.ProjectRepository;
@@ -15,6 +18,7 @@ import com.sourav.taskflow.repository.UserRepository;
 import com.sourav.taskflow.service.TaskService;
 import com.sourav.taskflow.enums.TaskStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,6 +36,7 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public TaskResponse createTask(CreateTaskRequest taskRequest) {
@@ -47,6 +52,8 @@ public class TaskServiceImpl implements TaskService {
         task.setCreatedBy(user.getId());
 
         Task savedTask = taskRepository.save(task);
+
+        eventPublisher.publishEvent(new TaskCreatedEvent(savedTask.getId(), savedTask.getAssignee().getId()));
 
         return mapToResponse(savedTask);
 
@@ -81,6 +88,8 @@ public class TaskServiceImpl implements TaskService {
         }
         task.setUpdatedBy(user.getId());
 
+        eventPublisher.publishEvent(new TaskUpdatedEvent(task.getId(), task.getAssignee().getId()));
+
         return mapToResponse(taskRepository.save(task));
     }
 
@@ -96,6 +105,9 @@ public class TaskServiceImpl implements TaskService {
         task.setDeleted(true);
         task.setDeletedBy(user.getId());
         task.setDeletedAt(LocalDateTime.now());
+
+        eventPublisher.publishEvent(new TaskDeletedEvent(task.getId(), task.getAssignee().getId()));
+
         taskRepository.delete(task);
     }
 
@@ -139,13 +151,13 @@ public class TaskServiceImpl implements TaskService {
     public void restoreTask(Long id) {
         Task task = taskRepository.findByIdIncludingDeleted(id).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
 
-        if(!task.isDeleted()){
+        if (!task.isDeleted()) {
             throw new ResourceNotFoundException("Task is not deleted");
         }
 
         User user = getCurrentUser();
 
-        if(!task.getAssignee().getId().equals(user.getId()) && user.getRole() != Role.ADMIN) {
+        if (!task.getAssignee().getId().equals(user.getId()) && user.getRole() != Role.ADMIN) {
             throw new AccessDeniedException("Access denied");
         }
 
