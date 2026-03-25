@@ -1,6 +1,5 @@
-package com.sourav.taskflow.dto;
+package com.sourav.taskflow.dto.tasks;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

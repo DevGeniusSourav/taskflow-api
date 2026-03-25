@@ -1,8 +1,8 @@
 package com.sourav.taskflow.service;
 
-import com.sourav.taskflow.dto.CreateTaskRequest;
-import com.sourav.taskflow.dto.TaskResponse;
-import com.sourav.taskflow.dto.auth.UpdateTaskRequest;
+import com.sourav.taskflow.dto.tasks.CreateTaskRequest;
+import com.sourav.taskflow.dto.tasks.TaskResponse;
+import com.sourav.taskflow.dto.tasks.UpdateTaskRequest;
 import com.sourav.taskflow.enums.TaskStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

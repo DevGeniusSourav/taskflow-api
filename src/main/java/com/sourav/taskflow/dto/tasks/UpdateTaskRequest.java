@@ -1,4 +1,4 @@
-package com.sourav.taskflow.dto.auth;
+package com.sourav.taskflow.dto.tasks;
 
 import com.sourav.taskflow.enums.TaskStatus;
 import lombok.Getter;

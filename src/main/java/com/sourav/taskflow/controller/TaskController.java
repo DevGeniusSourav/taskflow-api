@@ -1,8 +1,8 @@
 package com.sourav.taskflow.controller;
 
-import com.sourav.taskflow.dto.CreateTaskRequest;
-import com.sourav.taskflow.dto.TaskResponse;
-import com.sourav.taskflow.dto.auth.UpdateTaskRequest;
+import com.sourav.taskflow.dto.tasks.CreateTaskRequest;
+import com.sourav.taskflow.dto.tasks.TaskResponse;
+import com.sourav.taskflow.dto.tasks.UpdateTaskRequest;
 import com.sourav.taskflow.service.TaskService;
 import com.sourav.taskflow.enums.TaskStatus;
 import io.swagger.v3.oas.annotations.Operation;

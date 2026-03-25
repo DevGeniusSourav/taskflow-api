@@ -1,15 +1,15 @@
 package com.sourav.taskflow.service.impl;
 
-import com.sourav.taskflow.dto.CreateTaskRequest;
-import com.sourav.taskflow.dto.TaskResponse;
-import com.sourav.taskflow.dto.auth.UpdateTaskRequest;
+import com.sourav.taskflow.dto.tasks.CreateTaskRequest;
+import com.sourav.taskflow.dto.tasks.TaskResponse;
+import com.sourav.taskflow.dto.tasks.UpdateTaskRequest;
 import com.sourav.taskflow.entity.Project;
 import com.sourav.taskflow.entity.Task;
 import com.sourav.taskflow.entity.User;
 import com.sourav.taskflow.enums.Role;
-import com.sourav.taskflow.event.TaskCreatedEvent;
-import com.sourav.taskflow.event.TaskDeletedEvent;
-import com.sourav.taskflow.event.TaskUpdatedEvent;
+import com.sourav.taskflow.event.tasks.TaskCreatedEvent;
+import com.sourav.taskflow.event.tasks.TaskDeletedEvent;
+import com.sourav.taskflow.event.tasks.TaskUpdatedEvent;
 import com.sourav.taskflow.exception.AccessDeniedException;
 import com.sourav.taskflow.exception.ResourceNotFoundException;
 import com.sourav.taskflow.repository.ProjectRepository;
@@ -39,6 +39,7 @@ public class TaskServiceImpl implements TaskService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
+    @Transactional
     public TaskResponse createTask(CreateTaskRequest taskRequest) {
         Project project = projectRepository.findById(taskRequest.getProjectId()).orElseThrow(() -> new ResourceNotFoundException("Project not found"));
         User user = getCurrentUser();
@@ -60,6 +61,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public TaskResponse updateTask(Long id, UpdateTaskRequest taskRequest) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
 
@@ -94,6 +96,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public void deleteTask(Long id) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
 
@@ -108,7 +111,7 @@ public class TaskServiceImpl implements TaskService {
 
         eventPublisher.publishEvent(new TaskDeletedEvent(task.getId(), task.getAssignee().getId()));
 
-        taskRepository.delete(task);
+        taskRepository.save(task);
     }
 
     @Override
