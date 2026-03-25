@@ -1,0 +1,3 @@
+ALTER TABLE comments MODIFY task_id BIGINT NOT NULL;
+
+ALTER TABLE comments MODIFY user_id BIGINT NOT NULL;

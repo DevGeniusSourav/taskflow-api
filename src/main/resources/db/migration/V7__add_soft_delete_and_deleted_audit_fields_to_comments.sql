@@ -1,0 +1,3 @@
+ALTER TABLE comments ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;
+ALTER TABLE comments ADD COLUMN deleted_at TIMESTAMP;
+ALTER TABLE comments ADD COLUMN deleted_by BIGINT;
