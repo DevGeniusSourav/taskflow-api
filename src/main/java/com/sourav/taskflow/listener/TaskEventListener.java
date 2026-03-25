@@ -16,19 +16,19 @@ public class TaskEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
     public void handleTaskCreated(TaskCreatedEvent event) {
-        log.info("TaskCreatedEvent: {}", event);
+        log.info("TaskCreatedEvent: with id = " + event.getTaskId() + ", AssigneeId: " + event.getAssigneeId());
     }
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleTaskUpdated(TaskUpdatedEvent event) {
-        log.info("TaskUpdatedEvent: {}", event);
+        log.info("TaskUpdatedEvent: with id = " + event.getTaskId() + ", AssigneeId: " + event.getAssigneeId());
     }
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleTaskDeleted(TaskDeletedEvent event) {
-        log.info("TaskDeletedEvent: {}", event);
+        log.info("TaskDeletedEvent: with id = " + event.getTaskId() + ", AssigneeId: " + event.getAssigneeId());
     }
 
 }
