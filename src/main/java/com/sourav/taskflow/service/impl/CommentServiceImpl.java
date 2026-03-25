@@ -7,6 +7,9 @@ import com.sourav.taskflow.entity.Comment;
 import com.sourav.taskflow.entity.Task;
 import com.sourav.taskflow.entity.User;
 import com.sourav.taskflow.enums.Role;
+import com.sourav.taskflow.event.comments.CommentCreatedEvent;
+import com.sourav.taskflow.event.comments.CommentDeletedEvent;
+import com.sourav.taskflow.event.comments.CommentUpdatedEvent;
 import com.sourav.taskflow.exception.AccessDeniedException;
 import com.sourav.taskflow.exception.ResourceNotFoundException;
 import com.sourav.taskflow.repository.CommentRepository;
@@ -14,6 +17,7 @@ import com.sourav.taskflow.repository.TaskRepository;
 import com.sourav.taskflow.repository.UserRepository;
 import com.sourav.taskflow.service.CommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,6 +34,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -45,6 +50,8 @@ public class CommentServiceImpl implements CommentService {
         comment.setContent(commentRequest.getContent());
         comment.setTask(task);
         comment.setUser(user);
+
+        eventPublisher.publishEvent(new CommentCreatedEvent(comment.getId(), user.getId()));
 
         return mapToResponse(commentRepository.save(comment));
     }
@@ -72,6 +79,10 @@ public class CommentServiceImpl implements CommentService {
         if (comment.getContent() != null && !comment.getContent().isBlank()) {
             savedComment.setContent(comment.getContent());
         }
+
+        eventPublisher.publishEvent(new CommentUpdatedEvent(savedComment.getId(), user.getId()));
+
+
         return mapToResponse(commentRepository.save(savedComment));
     }
 
@@ -88,6 +99,9 @@ public class CommentServiceImpl implements CommentService {
         savedComment.setDeletedBy(user.getId());
         savedComment.setDeletedAt(LocalDateTime.now());
 
+        eventPublisher.publishEvent(new CommentDeletedEvent(savedComment.getId(), user.getId()));
+
+
         commentRepository.save(savedComment);
     }
 
@@ -96,7 +110,7 @@ public class CommentServiceImpl implements CommentService {
     public void restoreComment(Long taskId, Long commentId) {
         Comment comment = commentRepository.findByIdAndTaskIdIncludingDeleted(commentId, taskId).orElseThrow(() -> new ResourceNotFoundException("Comment Not Found!"));
 
-        if(!comment.isDeleted()){
+        if (!comment.isDeleted()) {
             throw new ResourceNotFoundException("Comment Is Not Deleted!");
         }
 
@@ -116,7 +130,7 @@ public class CommentServiceImpl implements CommentService {
             throw new AccessDeniedException("Access Denied!");
         }
     }
-    
+
     private User getCurrentUser() {
         String email = Objects.requireNonNull(SecurityContextHolder
                         .getContext()
