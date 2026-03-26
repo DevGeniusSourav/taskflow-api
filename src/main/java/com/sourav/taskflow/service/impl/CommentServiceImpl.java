@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 

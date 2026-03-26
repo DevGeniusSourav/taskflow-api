@@ -8,8 +8,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 public class UpdateCommentRequest {
 
     @NotBlank(message = "Content cannot be blank!")
