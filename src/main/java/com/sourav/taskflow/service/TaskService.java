@@ -15,8 +15,6 @@ public interface TaskService {
 
     void deleteTask(Long id);
 
-    TaskResponse getTaskById(Long id);
-
     Page<TaskResponse> getTasks(TaskStatus status, Long projectId, Pageable pageable);
 
     public void restoreTask(Long id);
