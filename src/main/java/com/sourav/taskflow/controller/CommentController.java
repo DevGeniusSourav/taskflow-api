@@ -5,6 +5,7 @@ import com.sourav.taskflow.dto.comments.CreateCommentRequest;
 import com.sourav.taskflow.dto.comments.UpdateCommentRequest;
 import com.sourav.taskflow.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +22,7 @@ public class CommentController {
 
     @PostMapping
     @Operation(summary = "Create a new comment")
-    public ResponseEntity<CommentResponse> createComment(@RequestBody CreateCommentRequest comment, @PathVariable("taskId") Long taskId) {
+    public ResponseEntity<CommentResponse> createComment(@Valid @RequestBody CreateCommentRequest comment, @PathVariable("taskId") Long taskId) {
         return ResponseEntity.ok().body(commentService.createComment(comment, taskId));
     }
 
@@ -33,7 +34,7 @@ public class CommentController {
 
     @PatchMapping("/{commentId}")
     @Operation(summary = "Update comment for a particular task")
-    public ResponseEntity<CommentResponse> updateComment(@PathVariable("taskId") Long taskId, @PathVariable("commentId") Long commentId, @RequestBody UpdateCommentRequest commentRequest) {
+    public ResponseEntity<CommentResponse> updateComment(@PathVariable("taskId") Long taskId, @PathVariable("commentId") Long commentId, @Valid @RequestBody UpdateCommentRequest commentRequest) {
         return ResponseEntity.ok().body(commentService.updateComment(taskId, commentId, commentRequest));
     }
 
