@@ -41,8 +41,9 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     public TaskResponse createTask(CreateTaskRequest taskRequest) {
-        Project project = projectRepository.findById(taskRequest.getProjectId()).orElseThrow(() -> new ResourceNotFoundException("Project not found"));
         User user = getCurrentUser();
+
+        Project project = projectRepository.findById(taskRequest.getProjectId()).orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
         Task task = new Task();
         task.setTitle(taskRequest.getTitle());
@@ -63,9 +64,9 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     public TaskResponse updateTask(Long id, UpdateTaskRequest taskRequest) {
-        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
-
         User user = getCurrentUser();
+
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
 
         if (!task.getAssignee().getId().equals(user.getId()) && user.getRole() != Role.ADMIN) {
             throw new AccessDeniedException("Access denied");
@@ -98,9 +99,9 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     public void deleteTask(Long id) {
-        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
-
         User user = getCurrentUser();
+
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
 
         if (!task.getAssignee().getId().equals(user.getId()) && user.getRole() != Role.ADMIN) {
             throw new AccessDeniedException("Access denied");
@@ -117,9 +118,9 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional(readOnly = true)
     public TaskResponse getTaskById(Long id) {
-        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task Not Found"));
-
         User user = getCurrentUser();
+
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task Not Found"));
 
         if (!task.getAssignee().getId().equals(user.getId()) && user.getRole() != Role.ADMIN) {
             throw new AccessDeniedException("Access Denied");
@@ -130,9 +131,9 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional(readOnly = true)
     public Page<TaskResponse> getTasks(TaskStatus status, Long projectId, Pageable pageable) {
-        Page<Task> tasks;
-
         User user = getCurrentUser();
+
+        Page<Task> tasks;
 
         if (status != null && projectId != null) {
             tasks = taskRepository.findByProjectIdAndStatusAndAssigneeId(projectId, status, user.getId(), pageable);
@@ -152,13 +153,14 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void restoreTask(Long id) {
+        User user = getCurrentUser();
+
         Task task = taskRepository.findByIdIncludingDeleted(id).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
 
         if (!task.isDeleted()) {
             throw new ResourceNotFoundException("Task is not deleted");
         }
 
-        User user = getCurrentUser();
 
         if (!task.getAssignee().getId().equals(user.getId()) && user.getRole() != Role.ADMIN) {
             throw new AccessDeniedException("Access denied");

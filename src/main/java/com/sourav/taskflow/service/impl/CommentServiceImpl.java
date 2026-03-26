@@ -40,8 +40,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public CommentResponse createComment(CreateCommentRequest commentRequest, Long taskId) {
-        Task task = taskRepository.findById(taskId).orElseThrow(() -> new ResourceNotFoundException("Task Not Found!"));
         User user = getCurrentUser();
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new ResourceNotFoundException("Task Not Found!"));
 
         if (!task.getAssignee().getId().equals(user.getId()) && user.getRole() != Role.ADMIN) {
             throw new AccessDeniedException("You Are Not Allowed To Create A Comment For This Task");
@@ -60,8 +60,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional(readOnly = true)
     public Page<CommentResponse> getComments(Long taskId, Pageable pageable) {
-        Task task = taskRepository.findById(taskId).orElseThrow(() -> new ResourceNotFoundException("Task Not Found!"));
         getCurrentUser();
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new ResourceNotFoundException("Task Not Found!"));
 
         return commentRepository.findByTaskId(taskId, pageable).map(this::mapToResponse);
     }
@@ -69,9 +69,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public CommentResponse updateComment(Long taskId, Long commentId, UpdateCommentRequest comment) {
-        Comment savedComment = commentRepository.findByIdAndTaskId(commentId, taskId).orElseThrow(() -> new ResourceNotFoundException("Comment Not Found For This Task!"));
-
         User user = getCurrentUser();
+        Comment savedComment = commentRepository.findByIdAndTaskId(commentId, taskId).orElseThrow(() -> new ResourceNotFoundException("Comment Not Found For This Task!"));
 
         if (!savedComment.getUser().getId().equals(user.getId())) {
             throw new AccessDeniedException("You Are Not Allowed To Update A Comment For This Task");
@@ -90,9 +89,9 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public void deleteComment(Long taskId, Long commentId) {
-        Comment savedComment = commentRepository.findByIdAndTaskId(commentId, taskId).orElseThrow(() -> new ResourceNotFoundException("Comment Not Found For This Task!"));
-
         User user = getCurrentUser();
+
+        Comment savedComment = commentRepository.findByIdAndTaskId(commentId, taskId).orElseThrow(() -> new ResourceNotFoundException("Comment Not Found For This Task!"));
 
         validateCommentOwnership(savedComment, user);
 
@@ -109,13 +108,13 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public void restoreComment(Long taskId, Long commentId) {
+        User user = getCurrentUser();
         Comment comment = commentRepository.findByIdAndTaskIdIncludingDeleted(commentId, taskId).orElseThrow(() -> new ResourceNotFoundException("Comment Not Found!"));
 
         if (!comment.isDeleted()) {
             throw new ResourceNotFoundException("Comment Is Not Deleted!");
         }
 
-        User user = getCurrentUser();
 
         validateCommentOwnership(comment, user);
 
