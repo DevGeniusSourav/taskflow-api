@@ -116,6 +116,19 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional(readOnly = true)
+    public TaskResponse getTaskById(Long id) {
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task Not Found"));
+
+        User user = getCurrentUser();
+
+        if (!task.getAssignee().getId().equals(user.getId()) && user.getRole() != Role.ADMIN) {
+            throw new AccessDeniedException("Access Denied");
+        }
+        return mapToResponse(task);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Page<TaskResponse> getTasks(TaskStatus status, Long projectId, Pageable pageable) {
         Page<Task> tasks;
 

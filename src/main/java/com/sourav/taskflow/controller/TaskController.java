@@ -37,6 +37,11 @@ public class TaskController {
         return taskService.getTasks(status, projectId, pageable);
     }
 
+    @GetMapping("/{id}")
+    public TaskResponse getTask(@PathVariable Long id) {
+        return taskService.getTaskById(id);
+    }
+
     @PatchMapping("/{id}")
     public TaskResponse updateTask(@PathVariable Long id, @RequestBody UpdateTaskRequest taskRequest) {
         return taskService.updateTask(id, taskRequest);
