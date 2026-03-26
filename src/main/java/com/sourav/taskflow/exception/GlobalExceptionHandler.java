@@ -47,4 +47,26 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFoundException(final UserNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCredentialsException(final InvalidCredentialsException ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
 }

@@ -5,6 +5,7 @@ import com.sourav.taskflow.dto.auth.LoginRequest;
 import com.sourav.taskflow.dto.auth.RegisterRequest;
 import com.sourav.taskflow.entity.User;
 import com.sourav.taskflow.enums.Role;
+import com.sourav.taskflow.exception.InvalidCredentialsException;
 import com.sourav.taskflow.repository.UserRepository;
 import com.sourav.taskflow.security.JwtService;
 import com.sourav.taskflow.service.AuthService;
@@ -37,7 +38,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest loginRequest) {
-        User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new RuntimeException("Invalid Credentials!"));
+        User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new InvalidCredentialsException("Invalid Credentials!"));
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid Credentials!");
