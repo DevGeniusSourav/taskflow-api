@@ -1,0 +1,4 @@
+ALTER TABLE projects
+    ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE,
+ADD COLUMN deleted_at TIMESTAMP,
+ADD COLUMN deleted_by BIGINT;
