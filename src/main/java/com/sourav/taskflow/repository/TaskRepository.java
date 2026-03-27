@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -25,4 +26,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     @Query(value = "SELECT * FROM tasks WHERE id = :id", nativeQuery = true)
     Optional<Task> findByIdIncludingDeleted(@Param("id") Long id);
+
+    Optional<List<Task>> findByProjectId(Long projectId);
 }

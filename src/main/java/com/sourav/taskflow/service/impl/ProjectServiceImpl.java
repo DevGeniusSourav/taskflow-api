@@ -4,11 +4,14 @@ import com.sourav.taskflow.dto.projects.CreateProjectRequest;
 import com.sourav.taskflow.dto.projects.ProjectResponse;
 import com.sourav.taskflow.dto.projects.UpdateProjectRequest;
 import com.sourav.taskflow.entity.Project;
+import com.sourav.taskflow.entity.Task;
 import com.sourav.taskflow.entity.User;
 import com.sourav.taskflow.enums.Role;
 import com.sourav.taskflow.exception.AccessDeniedException;
+import com.sourav.taskflow.exception.GeneralException;
 import com.sourav.taskflow.exception.ResourceNotFoundException;
 import com.sourav.taskflow.repository.ProjectRepository;
+import com.sourav.taskflow.repository.TaskRepository;
 import com.sourav.taskflow.repository.UserRepository;
 import com.sourav.taskflow.service.ProjectService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -28,6 +33,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final TaskRepository taskRepository;
 
     @Override
     public ProjectResponse createProject(CreateProjectRequest createProjectRequest) {
@@ -94,8 +100,13 @@ public class ProjectServiceImpl implements ProjectService {
         User user = getCurrentUser();
 
         Project project = projectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project Not Found!"));
+        Optional<List<Task>> task  = taskRepository.findByProjectId(id);
 
         validateProjectOwnership(project, user);
+
+        if(!task.isEmpty()) {
+            throw new GeneralException("Cannot Delete Projects With Tasks!");
+        }
 
         project.setDeleted(true);
         project.setDeletedBy(user.getId());

@@ -69,4 +69,15 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
+
+    @ExceptionHandler(GeneralException.class)
+    public ResponseEntity<ErrorResponse> handleGeneralException(final GeneralException ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
 }

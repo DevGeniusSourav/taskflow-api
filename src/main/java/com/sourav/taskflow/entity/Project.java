@@ -5,11 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "projects")
+@SQLRestriction("is_deleted=false")
 @Getter
 @Setter
 @NoArgsConstructor
