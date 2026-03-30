@@ -1,5 +1,6 @@
 package com.sourav.taskflow.controller;
 
+import com.sourav.taskflow.dto.ApiResponse;
 import com.sourav.taskflow.dto.tasks.CreateTaskRequest;
 import com.sourav.taskflow.dto.tasks.TaskResponse;
 import com.sourav.taskflow.dto.tasks.UpdateTaskRequest;
@@ -24,39 +25,39 @@ public class TaskController {
 
     @PostMapping
     @Operation(summary = "Create a new task")
-    public TaskResponse createTask(@Valid @RequestBody CreateTaskRequest taskRequest) {
-        return taskService.createTask(taskRequest);
+    public ApiResponse<TaskResponse> createTask(@Valid @RequestBody CreateTaskRequest taskRequest) {
+        return new ApiResponse<>(taskService.createTask(taskRequest), "Task Created Successfully");
     }
 
     @GetMapping
     @Operation(summary = "Get tasks with pagination and filters")
-    public Page<TaskResponse> getTasks(
+    public ApiResponse<Page<TaskResponse>> getTasks(
             @RequestParam(required = false) TaskStatus status,
             @RequestParam(required = false) Long projectId,
             Pageable pageable) {
-        return taskService.getTasks(status, projectId, pageable);
+        return new ApiResponse<>(taskService.getTasks(status, projectId, pageable), "Tasks Fetched Successfully");
     }
 
     @GetMapping("/{id}")
-    public TaskResponse getTask(@PathVariable Long id) {
-        return taskService.getTaskById(id);
+    public ApiResponse<TaskResponse> getTask(@PathVariable Long id) {
+        return new ApiResponse<>(taskService.getTaskById(id), "Task Fetched Successfully");
     }
 
     @PatchMapping("/{id}")
-    public TaskResponse updateTask(@PathVariable Long id, @RequestBody UpdateTaskRequest taskRequest) {
-        return taskService.updateTask(id, taskRequest);
+    public ApiResponse<TaskResponse> updateTask(@PathVariable Long id, @RequestBody UpdateTaskRequest taskRequest) {
+        return new ApiResponse<>(taskService.updateTask(id, taskRequest), "Task Updated Successfully");
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTask(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<String>> deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
-        return ResponseEntity.ok("Task Deleted!");
+        return ResponseEntity.ok(new ApiResponse<>("Task Deleted Successfully"));
     }
 
     @PutMapping("/restore/{id}")
-    public ResponseEntity<?> restoreTask(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<String>> restoreTask(@PathVariable Long id) {
         taskService.restoreTask(id);
-        return ResponseEntity.ok("Task Restored!");
+        return ResponseEntity.ok(new ApiResponse<>("Task Restored Successfully"));
     }
 
 }

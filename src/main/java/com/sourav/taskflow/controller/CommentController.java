@@ -1,5 +1,6 @@
 package com.sourav.taskflow.controller;
 
+import com.sourav.taskflow.dto.ApiResponse;
 import com.sourav.taskflow.dto.comments.CommentResponse;
 import com.sourav.taskflow.dto.comments.CreateCommentRequest;
 import com.sourav.taskflow.dto.comments.UpdateCommentRequest;
@@ -9,7 +10,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,34 +22,34 @@ public class CommentController {
 
     @PostMapping
     @Operation(summary = "Create a new comment")
-    public ResponseEntity<CommentResponse> createComment(@Valid @RequestBody CreateCommentRequest comment, @PathVariable("taskId") Long taskId) {
-        return ResponseEntity.ok().body(commentService.createComment(comment, taskId));
+    public ResponseEntity<ApiResponse<CommentResponse>> createComment(@Valid @RequestBody CreateCommentRequest comment, @PathVariable("taskId") Long taskId) {
+        return ResponseEntity.ok(new ApiResponse<>(commentService.createComment(comment, taskId), "Comment Created Successfully"));
     }
 
     @GetMapping
     @Operation(summary = "Get comments for a particular task")
-    public ResponseEntity<Page<CommentResponse>> getCommentsForTask(@PathVariable("taskId") Long taskId, Pageable pageable) {
-        return ResponseEntity.ok().body(commentService.getComments(taskId, pageable));
+    public ResponseEntity<ApiResponse<Page<CommentResponse>>> getCommentsForTask(@PathVariable("taskId") Long taskId, Pageable pageable) {
+        return ResponseEntity.ok(new ApiResponse<>(commentService.getComments(taskId, pageable), "Comments Fetched Successfully"));
     }
 
     @PatchMapping("/{commentId}")
     @Operation(summary = "Update comment for a particular task")
-    public ResponseEntity<CommentResponse> updateComment(@PathVariable("taskId") Long taskId, @PathVariable("commentId") Long commentId, @Valid @RequestBody UpdateCommentRequest commentRequest) {
-        return ResponseEntity.ok().body(commentService.updateComment(taskId, commentId, commentRequest));
+    public ResponseEntity<ApiResponse<CommentResponse>> updateComment(@PathVariable("taskId") Long taskId, @PathVariable("commentId") Long commentId, @Valid @RequestBody UpdateCommentRequest commentRequest) {
+        return ResponseEntity.ok(new ApiResponse<>(commentService.updateComment(taskId, commentId, commentRequest), "Comment Updated Successfully"));
     }
 
     @DeleteMapping("/{commentId}")
     @Operation(summary = "Delete comment for a particular task")
-    public ResponseEntity<?> deleteComment(@PathVariable("taskId") Long taskId, @PathVariable("commentId") Long commentId) {
+    public ResponseEntity<ApiResponse<String>> deleteComment(@PathVariable("taskId") Long taskId, @PathVariable("commentId") Long commentId) {
         commentService.deleteComment(taskId, commentId);
-        return ResponseEntity.status(HttpStatus.OK).body("Comment Deleted Successfully!");
+        return ResponseEntity.ok(new ApiResponse<>("Comment Deleted Successfully!"));
     }
 
     @PutMapping("/restore/{id}")
     @Operation(summary = "Restore comment for a particular task")
-    public ResponseEntity<?> restoreComment(@PathVariable("taskId") Long taskId, @PathVariable("id") Long commentId) {
+    public ResponseEntity<ApiResponse<String>> restoreComment(@PathVariable("taskId") Long taskId, @PathVariable("id") Long commentId) {
         commentService.restoreComment(taskId, commentId);
-        return ResponseEntity.status(HttpStatus.OK).body("Comment Restored Successfully!");
+        return ResponseEntity.ok(new ApiResponse<>("Comment Restored Successfully!"));
     }
 
 }

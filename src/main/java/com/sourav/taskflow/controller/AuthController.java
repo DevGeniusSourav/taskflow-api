@@ -1,5 +1,6 @@
 package com.sourav.taskflow.controller;
 
+import com.sourav.taskflow.dto.ApiResponse;
 import com.sourav.taskflow.dto.auth.AuthResponse;
 import com.sourav.taskflow.dto.auth.LoginRequest;
 import com.sourav.taskflow.dto.auth.RegisterRequest;
@@ -19,9 +20,9 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public String register(@Valid @RequestBody RegisterRequest registerRequest) {
+    public ApiResponse<String> register(@Valid @RequestBody RegisterRequest registerRequest) {
         authService.register(registerRequest);
-        return "User registered successfully";
+        return new ApiResponse<>("User registered successfully");
     }
 
     @PostMapping("/login")
