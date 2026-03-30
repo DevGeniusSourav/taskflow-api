@@ -11,6 +11,7 @@ import com.sourav.taskflow.event.tasks.TaskCreatedEvent;
 import com.sourav.taskflow.event.tasks.TaskDeletedEvent;
 import com.sourav.taskflow.event.tasks.TaskUpdatedEvent;
 import com.sourav.taskflow.exception.AccessDeniedException;
+import com.sourav.taskflow.exception.GeneralException;
 import com.sourav.taskflow.exception.ResourceNotFoundException;
 import com.sourav.taskflow.repository.ProjectRepository;
 import com.sourav.taskflow.repository.TaskRepository;
@@ -79,9 +80,11 @@ public class TaskServiceImpl implements TaskService {
             task.setDescription(taskRequest.getDescription());
         }
         if (taskRequest.getStatus() != null) {
+            if(!task.getStatus().canTransitionTo(taskRequest.getStatus())) {
+                throw new GeneralException("Invalid Status Transition");
+            }
             task.setStatus(taskRequest.getStatus());
         }
-
         if (taskRequest.getAssigneeId() != null) {
             if (user.getRole() != Role.ADMIN) {
                 throw new AccessDeniedException("Only ADMIN Can Update Assignee");
