@@ -13,6 +13,7 @@ import com.sourav.taskflow.event.tasks.TaskUpdatedEvent;
 import com.sourav.taskflow.exception.AccessDeniedException;
 import com.sourav.taskflow.exception.GeneralException;
 import com.sourav.taskflow.exception.ResourceNotFoundException;
+import com.sourav.taskflow.exception.UserNotFoundException;
 import com.sourav.taskflow.repository.ProjectRepository;
 import com.sourav.taskflow.repository.TaskRepository;
 import com.sourav.taskflow.repository.UserRepository;
@@ -44,14 +45,15 @@ public class TaskServiceImpl implements TaskService {
     public TaskResponse createTask(CreateTaskRequest taskRequest) {
         User user = getCurrentUser();
 
-        Project project = projectRepository.findById(taskRequest.getProjectId()).orElseThrow(() -> new ResourceNotFoundException("Project not found"));
+        Project project = projectRepository.findById(taskRequest.getProjectId()).orElseThrow(() -> new ResourceNotFoundException("Project Not Found"));
+        User assignee = userRepository.findById(taskRequest.getAssigneeId()).orElseThrow(() -> new UserNotFoundException("User Not Found"));
 
         Task task = new Task();
         task.setTitle(taskRequest.getTitle());
         task.setDescription(taskRequest.getDescription());
         task.setStatus(TaskStatus.TODO);
         task.setProject(project);
-        task.setAssignee(user);
+        task.setAssignee(assignee);
         task.setCreatedBy(user.getId());
 
         Task savedTask = taskRepository.save(task);
@@ -89,7 +91,7 @@ public class TaskServiceImpl implements TaskService {
             if (user.getRole() != Role.ADMIN) {
                 throw new AccessDeniedException("Only ADMIN Can Update Assignee");
             }
-            User newAssignee = userRepository.findById(taskRequest.getAssigneeId()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            User newAssignee = userRepository.findById(taskRequest.getAssigneeId()).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
             task.setAssignee(newAssignee);
         }
         task.setUpdatedBy(user.getId());
@@ -104,10 +106,10 @@ public class TaskServiceImpl implements TaskService {
     public void deleteTask(Long id) {
         User user = getCurrentUser();
 
-        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task Not Found"));
 
         if (!task.getAssignee().getId().equals(user.getId()) && user.getRole() != Role.ADMIN) {
-            throw new AccessDeniedException("Access denied");
+            throw new AccessDeniedException("Access Denied");
         }
         task.setDeleted(true);
         task.setDeletedBy(user.getId());
@@ -158,15 +160,15 @@ public class TaskServiceImpl implements TaskService {
     public void restoreTask(Long id) {
         User user = getCurrentUser();
 
-        Task task = taskRepository.findByIdIncludingDeleted(id).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
+        Task task = taskRepository.findByIdIncludingDeleted(id).orElseThrow(() -> new ResourceNotFoundException("Task Not Found"));
 
         if (!task.isDeleted()) {
-            throw new ResourceNotFoundException("Task is not deleted");
+            throw new ResourceNotFoundException("Task Is Not Deleted");
         }
 
 
         if (!task.getAssignee().getId().equals(user.getId()) && user.getRole() != Role.ADMIN) {
-            throw new AccessDeniedException("Access denied");
+            throw new AccessDeniedException("Access Denied");
         }
 
         task.setDeleted(false);
@@ -182,7 +184,7 @@ public class TaskServiceImpl implements TaskService {
                         .getAuthentication())
                 .getName();
 
-        return userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
     }
 
     private TaskResponse mapToResponse(Task task) {
