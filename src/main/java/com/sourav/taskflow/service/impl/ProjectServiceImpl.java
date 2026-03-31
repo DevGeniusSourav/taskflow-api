@@ -36,6 +36,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final TaskRepository taskRepository;
 
     @Override
+    @Transactional
     public ProjectResponse createProject(CreateProjectRequest createProjectRequest) {
 
         User user = getCurrentUser();
@@ -49,6 +50,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ProjectResponse> getProjects(Pageable pageable) {
 
         User user = getCurrentUser();
@@ -65,6 +67,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProjectResponse getProject(Long id) {
         User user = getCurrentUser();
 
@@ -76,6 +79,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Transactional
     public ProjectResponse updateProject(Long id, UpdateProjectRequest updateProjectRequest) {
 
         User user = getCurrentUser();
@@ -96,6 +100,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Transactional
     public void deleteProject(Long id) {
         User user = getCurrentUser();
 
@@ -116,6 +121,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Transactional
     public void restoreProject(Long id) {
         User user = getCurrentUser();
 

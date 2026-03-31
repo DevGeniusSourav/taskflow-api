@@ -32,6 +32,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public void addMember(Long projectId, Long memberId) {
         User user = getCurrentUser();
 
@@ -64,6 +65,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ProjectMemberResponse> getProjectMembers(Long projectId, Pageable pageable) {
         getCurrentUser();
 
@@ -73,6 +75,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
 
 
     @Override
+    @Transactional
     public void removeMember(Long projectId, Long memberId) {
         User user = getCurrentUser();
 
@@ -100,6 +103,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
+    @Transactional
     public void restoreMember(Long projectId, Long memberId) {
         User user = getCurrentUser();
 
