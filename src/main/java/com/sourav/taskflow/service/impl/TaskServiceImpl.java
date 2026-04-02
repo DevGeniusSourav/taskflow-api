@@ -7,6 +7,7 @@ import com.sourav.taskflow.entity.Project;
 import com.sourav.taskflow.entity.Task;
 import com.sourav.taskflow.entity.User;
 import com.sourav.taskflow.enums.Role;
+import com.sourav.taskflow.enums.TaskStatus;
 import com.sourav.taskflow.event.tasks.TaskCreatedEvent;
 import com.sourav.taskflow.event.tasks.TaskDeletedEvent;
 import com.sourav.taskflow.event.tasks.TaskUpdatedEvent;
@@ -18,8 +19,9 @@ import com.sourav.taskflow.repository.ProjectRepository;
 import com.sourav.taskflow.repository.TaskRepository;
 import com.sourav.taskflow.repository.UserRepository;
 import com.sourav.taskflow.service.TaskService;
-import com.sourav.taskflow.enums.TaskStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +44,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "tasks", allEntries = true)
     public TaskResponse createTask(CreateTaskRequest taskRequest) {
         User user = getCurrentUser();
 
@@ -66,6 +69,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "tasks", allEntries = true)
     public TaskResponse updateTask(Long id, UpdateTaskRequest taskRequest) {
         User user = getCurrentUser();
 
@@ -103,6 +107,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "tasks", allEntries = true)
     public void deleteTask(Long id) {
         User user = getCurrentUser();
 
@@ -135,6 +140,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "tasks")
     public Page<TaskResponse> getTasks(TaskStatus status, Long projectId, Pageable pageable) {
         User user = getCurrentUser();
 

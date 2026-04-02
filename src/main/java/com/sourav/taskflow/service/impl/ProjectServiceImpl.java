@@ -15,6 +15,8 @@ import com.sourav.taskflow.repository.TaskRepository;
 import com.sourav.taskflow.repository.UserRepository;
 import com.sourav.taskflow.service.ProjectService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,6 +39,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "projects", allEntries = true)
     public ProjectResponse createProject(CreateProjectRequest createProjectRequest) {
 
         User user = getCurrentUser();
@@ -51,6 +54,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "projects")
     public Page<ProjectResponse> getProjects(Pageable pageable) {
 
         User user = getCurrentUser();
@@ -80,6 +84,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "projects", allEntries = true)
     public ProjectResponse updateProject(Long id, UpdateProjectRequest updateProjectRequest) {
 
         User user = getCurrentUser();
@@ -101,6 +106,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "projects", allEntries = true)
     public void deleteProject(Long id) {
         User user = getCurrentUser();
 
